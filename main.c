@@ -1,6 +1,5 @@
 // https://www.unix.com/man-page/posix/1posix/ls
 
-#define _DEFAULT_SOURCE //< for DT_DIR.
 
 #include "file_info.h"
 #include <dirent.h>
@@ -13,19 +12,9 @@ static int is_visible(const struct dirent *d)
   return (d->d_name[0] != '.');
 }
 
-static int sort_dir_first(const struct dirent **a, const struct dirent **b)
+static int alphacasesort(const struct dirent **a, const struct dirent **b)
 {
-#ifndef DT_DIR
-  #warning Cant find DT_DIR macros: Sorting will be dir unsensitive.
-#else
-  int a_is_dir = ((*a)->d_type == DT_DIR);
-  int b_is_dir = ((*b)->d_type == DT_DIR);
-
-  if(a_is_dir != b_is_dir)
-    return b_is_dir - a_is_dir;
-  else
-#endif
-    return alphasort(a, b);
+  return strcasecmp((*a)->d_name, (*b)->d_name);
 }
 
 
@@ -87,7 +76,7 @@ int main(int argc, char *argv[])
   }
   // If user passed file (not a directory) as path <--
 
-  files_num = scandir(user_path ? user_path : ".", &files, flag_all ? NULL : is_visible, sort_dir_first);
+  files_num = scandir(user_path ? user_path : ".", &files, flag_all ? NULL : is_visible, alphacasesort);
   if(files_num < 0)
   {
     files_num = 0;
