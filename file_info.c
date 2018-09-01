@@ -23,6 +23,21 @@ int file_info_print(const char *pathname)
   if(stat(pathname, &st) != 0)
     return -1;
 
+/*
+  // File type.
+  {
+      d      Directory.
+       b      Block special file.
+       c      Character special file.
+       l (ell) Symbolic link.
+       p      FIFO.
+       -      Regular file.
+  }
+
+  // Permissions in symbolic notation.
+  printf("%c%c%c%c%c%c%c%c%c%c%c",
+*/
+
   // Number of links
   printf(" %3llu", (unsigned long long)st.st_nlink);
 
