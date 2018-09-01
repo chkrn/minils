@@ -1,3 +1,6 @@
+#ifndef __DYNAR_H__
+#define __DYNAR_H__
+
 #include <stdlib.h>
 
 /**
@@ -28,3 +31,4 @@ void dynar_free(dynar_t *self);
 */
 void dynar_append(dynar_t *self, char *data);
 
+#endif /* __DYNAR_H__ */
