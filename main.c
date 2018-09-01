@@ -66,6 +66,7 @@ int print_file_stat(const char *pathname)
 
 int main(int argc, char *argv[])
 {
+  int rval = -1;
   int flag_all = 0;
   DIR *dirp = opendir(".");
 
@@ -83,7 +84,7 @@ int main(int argc, char *argv[])
 
     default:
       fprintf(stderr, "Wrong options.\nUsage: %s [a]\n", argv[0]);
-    return -1;
+    goto fail;
   }
 
   tzset(); // Init for localtime.
@@ -98,21 +99,26 @@ int main(int argc, char *argv[])
         if(print_file_stat(dp->d_name) != 0)
         {
           perror("Failed to get file info");
-          return -1;
+          goto fail;
         }
     }
 
     if(closedir(dirp) != 0)
     {
       perror("Failed to close dir");
-      return -1;
+      goto fail;
     }
   }
   else
   {
     perror("Failed to open dir");
-    return -1;
+    goto fail;
   }
 
-  return 0;
+  rval = 0;
+
+fail:
+  // TODO free smth
+
+  return rval;
 }
