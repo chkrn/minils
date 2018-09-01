@@ -3,13 +3,23 @@
 #include "file_info.h"
 #include <dirent.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
+
+static int is_visible(const struct dirent *d)
+{
+  return (d->d_name[0] != '.');
+}
+
 
 int main(int argc, char *argv[])
 {
   int rval = -1;
   int flag_all = 0;
-  DIR *dirp = opendir(".");
+
+  int i;
+  int files_num = 0;
+  struct dirent **files = NULL;
 
   switch(argc)
   {
@@ -28,38 +38,31 @@ int main(int argc, char *argv[])
     goto fail;
   }
 
-  tzset(); // Init for localtime.
-
-  if(dirp)
+  files_num = scandir(".", &files, flag_all ? NULL : is_visible, alphasort);
+  if(files_num < 0)
   {
-    struct dirent *dp;
-
-    while(dp = readdir(dirp))
-    {
-      if(flag_all || dp->d_name[0] != '.')
-        if(file_info_print(dp->d_name) != 0)
-        {
-          perror("Failed to get file info");
-          goto fail;
-        }
-    }
-
-    if(closedir(dirp) != 0)
-    {
-      perror("Failed to close dir");
-      goto fail;
-    }
-  }
-  else
-  {
-    perror("Failed to open dir");
+    files_num = 0;
+    perror("Failed to scan direcctory");
     goto fail;
   }
+
+  tzset(); // Init for localtime.
+  
+
+  for(i = 0; i < files_num; i++)
+    if(file_info_print(files[i]->d_name) != 0)
+    {
+      perror("Failed to get file info");
+      goto fail;
+    }
 
   rval = 0;
 
 fail:
-  // TODO free smth
+  for(i = 0; i < files_num; i++)
+    free(files[i]);
+
+  free(files);
 
   return rval;
 }
