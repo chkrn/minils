@@ -1,8 +1,42 @@
 // https://www.garron.me/en/go2linux/ls-file-permissions.html
 
+#include <dirent.h>
+#include <grp.h>
 #include <stdio.h>
 #include <sys/types.h>
-#include <dirent.h>
+#include <sys/stat.h>
+#include <pwd.h>
+#include <unistd.h>
+
+void print_id(const char* name, unsigned long int id)
+{
+  if(name)
+    printf(" %8s", name);
+  else
+    printf(" %8lu", id);
+}
+
+int print_file_stat(const char *pathname)
+{
+  struct stat st;
+
+  if(stat(pathname, &st) != 0)
+    return -1;
+
+  { // UID -->
+    struct passwd *pw = getpwuid(st.st_uid);
+    print_id(pw ? pw->pw_name : NULL, st.st_uid);
+  } // UID <--
+
+  { // GID -->
+    struct group *gr = getgrgid(st.st_gid);
+    print_id(gr ? gr->gr_name : NULL, st.st_gid);
+  } // GID <--
+
+  printf(" %s\n", pathname);
+
+  return 0;
+}
 
 int main(int argc, char *argv[])
 {
@@ -23,7 +57,7 @@ int main(int argc, char *argv[])
 
     default:
       fprintf(stderr, "Wrong options.\nUsage: %s [a]\n", argv[0]);
-      return -1;
+    return -1;
   }
 
   if(dirp)
@@ -33,7 +67,11 @@ int main(int argc, char *argv[])
     while(dp = readdir(dirp))
     {
       if(flag_all || dp->d_name[0] != '.')
-        printf(">%s\n", dp->d_name);
+        if(print_file_stat(dp->d_name) != 0)
+        {
+          perror("Failed to get file info");
+          return -1;
+        }
     }
 
     if(closedir(dirp) != 0)
