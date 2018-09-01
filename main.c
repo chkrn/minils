@@ -16,7 +16,7 @@ static int is_visible(const struct dirent *d)
 int main(int argc, char *argv[])
 {
   int i;
-  int rval = -1;
+  int rval = 1;
 
   int files_num = 0;
   struct dirent **files = NULL;

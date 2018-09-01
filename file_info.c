@@ -35,27 +35,31 @@ static void print_date(const time_t *timep)
   if(strftime(str, sizeof(str), fmt, &filetime) == 0)
     goto fail;
 
-  printf(" %10s", str);
+  printf(" %s", str);
   return;
 
 fail:
-  printf(" %10s", "???");
+  printf(" ???");
 }
 
 void file_info_print(const char *filename, const struct stat *st)
 {
-
-/*
   // File type.
   {
-      d      Directory.
-       b      Block special file.
-       c      Character special file.
-       l (ell) Symbolic link.
-       p      FIFO.
-       -      Regular file.
+    int type = '?';
+
+         if(S_ISREG (st->st_mode)) type = '-';
+    else if(S_ISDIR (st->st_mode)) type = 'd';
+    else if(S_ISLNK (st->st_mode)) type = 'l';
+    else if(S_ISCHR (st->st_mode)) type = 'c';
+    else if(S_ISBLK (st->st_mode)) type = 'b';
+    else if(S_ISFIFO(st->st_mode)) type = 'p';
+    else if(S_ISSOCK(st->st_mode)) type = 's';
+
+    printf("%c", type);
   }
 
+/*
   // Permissions in symbolic notation.
   printf("%c%c%c%c%c%c%c%c%c%c%c",
 */
