@@ -55,12 +55,13 @@ int main(int argc, char *argv[])
   if(files_num < 0)
   {
     files_num = 0;
-    perror("Failed to scan direcctory");
+    perror("Failed to scan directory");
     goto fail;
   }
 
   for(i = 0; i < files_num; i++)
   {
+    struct stat st;
     char *full_file_path = NULL;
 
     if(user_path)
@@ -72,9 +73,15 @@ int main(int argc, char *argv[])
     else
       full_file_path = files[i]->d_name;
 
-    if(file_info_print(full_file_path) != 0)
+    if(stat(full_file_path, &st) != 0)
     {
       perror("Failed to get file info");
+      goto fail;
+    }
+
+    if(file_info_print(files[i]->d_name, &st) != 0)
+    {
+      perror("Failed to print file info");
       goto fail;
     }
 
@@ -82,6 +89,7 @@ int main(int argc, char *argv[])
       free(full_file_path);
   }
 
+ok:
   rval = 0;
 
 fail:

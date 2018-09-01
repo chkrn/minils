@@ -1,10 +1,10 @@
 // https://www.unix.com/man-page/posix/1posix/ls
 
+#include "file_info.h"
 #include <grp.h>
 #include <langinfo.h>
 #include <stdio.h>
 #include <sys/types.h>
-#include <sys/stat.h>
 #include <pwd.h>
 #include <time.h>
 
@@ -16,12 +16,8 @@ static void print_id(const char* name, unsigned long long id)
     printf(" %8llu", id);
 }
 
-int file_info_print(const char *pathname)
+int file_info_print(const char *filename, const struct stat *st)
 {
-  struct stat st;
-
-  if(stat(pathname, &st) != 0)
-    return -1;
 
 /*
   // File type.
@@ -39,24 +35,24 @@ int file_info_print(const char *pathname)
 */
 
   // Number of links
-  printf(" %3llu", (unsigned long long)st.st_nlink);
+  printf(" %3llu", (unsigned long long)st->st_nlink);
 
   { // UID -->
-    struct passwd *pw = getpwuid(st.st_uid);
-    print_id(pw ? pw->pw_name : NULL, st.st_uid);
+    struct passwd *pw = getpwuid(st->st_uid);
+    print_id(pw ? pw->pw_name : NULL, st->st_uid);
   } // UID <--
 
   { // GID -->
-    struct group *gr = getgrgid(st.st_gid);
-    print_id(gr ? gr->gr_name : NULL, st.st_gid);
+    struct group *gr = getgrgid(st->st_gid);
+    print_id(gr ? gr->gr_name : NULL, st->st_gid);
   } // GID <--
 
   // File size.
-  printf(" %8llu", (unsigned long long)st.st_size);
+  printf(" %8llu", (unsigned long long)st->st_size);
 
   { // Data and time -->
     char str[256];
-    struct tm *tm = localtime(&st.st_mtime);
+    struct tm *tm = localtime(&st->st_mtime);
 
     if(tm == NULL)
     {
@@ -74,7 +70,7 @@ int file_info_print(const char *pathname)
   } // Data and time <--
 
   // File name.
-  printf(" %s\n", pathname);
+  printf(" %s\n", filename);
 
   return 0;
 }
