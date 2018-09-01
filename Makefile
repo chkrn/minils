@@ -1,13 +1,13 @@
 CC=gcc
-CFLAGS=-I.
-DEPS = file_info.h
+CFLAGS=-I. -Wall
+DEPS = file_info.h Makefile
 OBJ = file_info.o main.o
 
 %.o: %.c $(DEPS)
-	$(CC) -g -c -o $@ $< $(CFLAGS)
+	$(CC) -c -o $@ $< $(CFLAGS)
 
 minils: $(OBJ)
-	$(CC) -g -o $@ $^ $(CFLAGS)
+	$(CC) -o $@ $^ $(CFLAGS)
 
 clean:
 	rm -f *.o minils
