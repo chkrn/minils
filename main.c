@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
   if(user_path)
   {
     struct stat st;
-    if(stat(user_path, &st) == 0)
+    if(lstat(user_path, &st) == 0)
     {
       if(!S_ISDIR(st.st_mode))
       {
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
     else
       full_file_path = files[i]->d_name;
 
-    if(stat(full_file_path, &st) != 0)
+    if(lstat(full_file_path, &st) != 0)
     {
       perror("Failed to get file info");
       goto fail;
