@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <pwd.h>
+#include <unistd.h>
 #include <time.h>
 
 static void print_permissions(int r, int w, int x)
@@ -47,7 +48,7 @@ fail:
   printf("  ??? ?? ????");
 }
 
-void file_info_print(const char *filename, const struct stat *st)
+void file_info_print(const char *file_path, const char *filename_to_print, const struct stat *st)
 {
   // File type.
   {
@@ -90,6 +91,16 @@ void file_info_print(const char *filename, const struct stat *st)
   print_date(&st->st_mtime);
 
   // File name.
-  printf(" %s\n", filename);
+  printf(" %s", filename_to_print);
+
+  // Value of symbolic link.
+  if(S_ISLNK(st->st_mode))
+  {
+    char str[256];
+    if(readlink(file_path, str, sizeof(str)) > 0)
+      printf(" -> %s", str);
+  }
+
+  printf("\n");
 }
 

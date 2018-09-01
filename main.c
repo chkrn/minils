@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     {
       if(!S_ISDIR(st.st_mode))
       {
-        file_info_print(user_path, &st);
+        file_info_print(user_path, user_path, &st);
         goto ok;
       }
     }
@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
       goto fail;
     }
 
-    file_info_print(files[i]->d_name, &st);
+    file_info_print(full_file_path, files[i]->d_name, &st);
 
     if(user_path)
       free(full_file_path);
