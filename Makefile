@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-I.
-DEPS =
-OBJ = main.o
+DEPS = dynar.h
+OBJ = dynar.o main.o
 
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
