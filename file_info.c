@@ -33,18 +33,18 @@ static void print_date(const time_t *timep)
 
   // According POSIX (show time or year).
   if((((curtime.tm_year - filetime.tm_year) * 12) + curtime.tm_mon - filetime.tm_mon) > 6)
-    fmt = "%b %e %Y";
+    fmt = "%b %e  %Y";
   else
     fmt = "%b %e %H:%M";
 
   if(strftime(str, sizeof(str), fmt, &filetime) == 0)
     goto fail;
 
-  printf(" %s", str);
+  printf(" %12s", str);
   return;
 
 fail:
-  printf(" ???");
+  printf("  ??? ?? ????");
 }
 
 void file_info_print(const char *filename, const struct stat *st)
