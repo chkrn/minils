@@ -59,13 +59,8 @@ int main(int argc, char *argv[])
     {
       if(!S_ISDIR(st.st_mode))
       {
-        if(file_info_print(user_path, &st) != 0)
-        {
-          perror("Failed to print info about user file");
-          goto fail;
-        }
-        else
-          goto ok;
+        file_info_print(user_path, &st);
+        goto ok;
       }
     }
     else
@@ -104,11 +99,7 @@ int main(int argc, char *argv[])
       goto fail;
     }
 
-    if(file_info_print(files[i]->d_name, &st) != 0)
-    {
-      perror("Failed to print file info");
-      goto fail;
-    }
+    file_info_print(files[i]->d_name, &st);
 
     if(user_path)
       free(full_file_path);

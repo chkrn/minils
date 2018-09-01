@@ -42,7 +42,7 @@ fail:
   printf(" %10s", "???");
 }
 
-int file_info_print(const char *filename, const struct stat *st)
+void file_info_print(const char *filename, const struct stat *st)
 {
 
 /*
@@ -81,7 +81,5 @@ int file_info_print(const char *filename, const struct stat *st)
 
   // File name.
   printf(" %s\n", filename);
-
-  return 0;
 }
 
