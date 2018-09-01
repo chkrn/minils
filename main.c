@@ -51,8 +51,6 @@ int main(int argc, char *argv[])
     }
   // Cmd line options <--
 
-  tzset(); // Init for localtime.
-
   // If user passed file (not a directory) as path -->
   if(user_path)
   {

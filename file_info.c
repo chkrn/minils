@@ -2,7 +2,6 @@
 
 #include "file_info.h"
 #include <grp.h>
-#include <langinfo.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <pwd.h>
@@ -52,15 +51,29 @@ int file_info_print(const char *filename, const struct stat *st)
 
   { // Data and time -->
     char str[256];
-    struct tm *tm = localtime(&st->st_mtime);
+    const char *fmt;
+    time_t curseconds = time(NULL);
+    struct tm curtime;
+    struct tm filetime;
 
-    if(tm == NULL)
+    localtime_r(&curseconds, &curtime);
+    localtime_r(&st->st_mtime, &filetime);
+/*
+    // TODO Check?
+    if(== NULL)
     {
       perror("Failed to get local time");
       return -1;
     }
+*/
 
-    if(strftime(str, sizeof(str), nl_langinfo(D_T_FMT), tm) == 0)
+    // According POSIX.
+    if((((curtime.tm_year - filetime.tm_year) * 12) + curtime.tm_mon - filetime.tm_mon) > 6)
+      fmt = "%b %e %Y";
+    else
+      fmt = "%b %e %H:%M";
+
+    if(strftime(str, sizeof(str), fmt, &filetime) == 0)
     {
       perror("Failed to format time string");
       return -1;
