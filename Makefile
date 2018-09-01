@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-I.
-DEPS = dynar.h
-OBJ = dynar.o main.o
+DEPS = dynar.h file_info.h
+OBJ = dynar.o file_info.o main.o
 
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
