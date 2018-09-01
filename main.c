@@ -18,38 +18,65 @@ int main(int argc, char *argv[])
   int i;
   int rval = -1;
 
-  char *user_path = NULL;
-
   int files_num = 0;
   struct dirent **files = NULL;
 
-  int flag_all = 0; //< '-a' option.
-  if(argc > 1 && argv[1][0] == '-' && argv[1][1] == 'a' && argv[1][2] == '\0')
-    flag_all = 1;
+  // Cmd line options -->
+    char *user_path = NULL;
 
-  switch(argc)
-  {
-    case 1:
-    break;
+    int flag_all = 0; //< '-a' option.
+    if(argc > 1 && argv[1][0] == '-' && argv[1][1] == 'a' && argv[1][2] == '\0')
+      flag_all = 1;
 
-    case 2:
-      if(!flag_all)
-        user_path = argv[1];
-    break;
+    switch(argc)
+    {
+      case 1:
+      break;
 
-    case 3:
-      if(flag_all)
-      {
-        user_path = argv[2];
-        break;
-      }
+      case 2:
+        if(!flag_all)
+          user_path = argv[1];
+      break;
 
-    default:
-      fprintf(stderr, "Wrong options.\nUsage: %s [-a] [PATH]\n", argv[0]);
-    goto fail;
-  }
+      case 3:
+        if(flag_all)
+        {
+          user_path = argv[2];
+          break;
+        }
+
+      default:
+        fprintf(stderr, "Wrong options.\nUsage: %s [-a] [PATH]\n", argv[0]);
+      goto fail;
+    }
+  // Cmd line options <--
 
   tzset(); // Init for localtime.
+
+  // If user passed file (not a directory) as path -->
+  if(user_path)
+  {
+    struct stat st;
+    if(stat(user_path, &st) == 0)
+    {
+      if(!S_ISDIR(st.st_mode))
+      {
+        if(file_info_print(user_path, &st) != 0)
+        {
+          perror("Failed to print info about user file");
+          goto fail;
+        }
+        else
+          goto ok;
+      }
+    }
+    else
+    {
+      perror("Failed to get info about user path");
+      goto fail;
+    }
+  }
+  // If user passed file (not a directory) as path <--
 
   files_num = scandir(user_path ? user_path : ".", &files, flag_all ? NULL : is_visible, alphasort);
   if(files_num < 0)
