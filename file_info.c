@@ -15,6 +15,33 @@ static void print_id(const char* name, unsigned long long id)
     printf(" %8llu", id);
 }
 
+static void print_date(const time_t *timep)
+{
+  char str[256];
+  const char *fmt;
+  time_t curseconds = time(NULL);
+  struct tm curtime;
+  struct tm filetime;
+
+  if(!localtime_r(&curseconds, &curtime) || !localtime_r(timep, &filetime))
+    goto fail;
+
+  // According POSIX (show time or year).
+  if((((curtime.tm_year - filetime.tm_year) * 12) + curtime.tm_mon - filetime.tm_mon) > 6)
+    fmt = "%b %e %Y";
+  else
+    fmt = "%b %e %H:%M";
+
+  if(strftime(str, sizeof(str), fmt, &filetime) == 0)
+    goto fail;
+
+  printf(" %10s", str);
+  return;
+
+fail:
+  printf(" %10s", "???");
+}
+
 int file_info_print(const char *filename, const struct stat *st)
 {
 
@@ -49,38 +76,8 @@ int file_info_print(const char *filename, const struct stat *st)
   // File size.
   printf(" %8llu", (unsigned long long)st->st_size);
 
-  { // Data and time -->
-    char str[256];
-    const char *fmt;
-    time_t curseconds = time(NULL);
-    struct tm curtime;
-    struct tm filetime;
-
-    localtime_r(&curseconds, &curtime);
-    localtime_r(&st->st_mtime, &filetime);
-/*
-    // TODO Check?
-    if(== NULL)
-    {
-      perror("Failed to get local time");
-      return -1;
-    }
-*/
-
-    // According POSIX.
-    if((((curtime.tm_year - filetime.tm_year) * 12) + curtime.tm_mon - filetime.tm_mon) > 6)
-      fmt = "%b %e %Y";
-    else
-      fmt = "%b %e %H:%M";
-
-    if(strftime(str, sizeof(str), fmt, &filetime) == 0)
-    {
-      perror("Failed to format time string");
-      return -1;
-    }
-
-    printf(" %10s", str);
-  } // Data and time <--
+  // Data and time.
+  print_date(&st->st_mtime);
 
   // File name.
   printf(" %s\n", filename);
