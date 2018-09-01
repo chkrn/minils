@@ -8,9 +8,19 @@
 #include <unistd.h>
 #include <time.h>
 
-static void print_permissions(int r, int w, int x)
+static void print_permissions(int r, int w, int x, int s, int t)
 {
-  printf("%c%c%c", r ? 'r' : '-', w ? 'w' : '-', x ? 'x' : '-');
+  int last_char;
+
+  if(s)
+    last_char = x ? 's' : 'S';
+  else
+    last_char = x ? 'x' : '-';
+
+  if(t)
+    last_char = 't';
+
+  printf("%c%c%c", r ? 'r' : '-', w ? 'w' : '-', last_char);
 }
 
 static void print_id(const char* name, unsigned long long id)
@@ -65,11 +75,10 @@ void file_info_print(const char *file_path, const char *filename_to_print, const
     printf("%c", type);
   }
 
-  #warning TODO setguid bits etc.
   // Permissions.
-  print_permissions(st->st_mode & S_IRUSR, st->st_mode & S_IWUSR, st->st_mode & S_IXUSR);
-  print_permissions(st->st_mode & S_IRGRP, st->st_mode & S_IWGRP, st->st_mode & S_IXGRP);
-  print_permissions(st->st_mode & S_IROTH, st->st_mode & S_IWOTH, st->st_mode & S_IXOTH);
+  print_permissions(st->st_mode & S_IRUSR, st->st_mode & S_IWUSR, st->st_mode & S_IXUSR, st->st_mode & S_ISUID, 0);
+  print_permissions(st->st_mode & S_IRGRP, st->st_mode & S_IWGRP, st->st_mode & S_IXGRP, st->st_mode & S_ISGID, 0);
+  print_permissions(st->st_mode & S_IROTH, st->st_mode & S_IWOTH, st->st_mode & S_IXOTH, 0, st->st_mode & S_ISVTX);
 
   // Number of links
   printf(" %3llu", (unsigned long long)st->st_nlink);
