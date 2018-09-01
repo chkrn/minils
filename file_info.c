@@ -23,6 +23,9 @@ int file_info_print(const char *pathname)
   if(stat(pathname, &st) != 0)
     return -1;
 
+  // Number of links
+  printf(" %3llu", (unsigned long long)st.st_nlink);
+
   { // UID -->
     struct passwd *pw = getpwuid(st.st_uid);
     print_id(pw ? pw->pw_name : NULL, st.st_uid);
