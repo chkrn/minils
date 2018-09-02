@@ -1,5 +1,3 @@
-// https://www.unix.com/man-page/posix/1posix/ls
-
 #include "file_info.h"
 #include <grp.h>
 #include <stdio.h>
@@ -8,17 +6,16 @@
 #include <unistd.h>
 #include <time.h>
 
-static void print_permissions(int r, int w, int x, int s, int t)
+static void print_permissions(mode_t r, mode_t w, mode_t x, mode_t s, mode_t t)
 {
   int last_char;
 
   if(s)
     last_char = x ? 's' : 'S';
+  else if(t)
+    last_char = x ? 't' : 'T';
   else
     last_char = x ? 'x' : '-';
-
-  if(t)
-    last_char = 't';
 
   printf("%c%c%c", r ? 'r' : '-', w ? 'w' : '-', last_char);
 }

@@ -1,6 +1,3 @@
-// https://www.unix.com/man-page/posix/1posix/ls
-
-
 #include "file_info.h"
 #include <dirent.h>
 #include <stdio.h>
