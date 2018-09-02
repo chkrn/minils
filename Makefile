@@ -6,8 +6,8 @@ OBJ = file_info.o main.o
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-minils: $(OBJ)
+ls: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS)
 
 clean:
-	rm -f *.o minils
+	rm -f *.o ls
