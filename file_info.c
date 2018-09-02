@@ -102,8 +102,8 @@ void file_info_print(const char *file_path, const char *filename_to_print, const
   // Value of symbolic link.
   if(S_ISLNK(st->st_mode))
   {
-    char str[256];
-    if(readlink(file_path, str, sizeof(str)) > 0)
+    char str[256] = { '\0' };
+    if(readlink(file_path, str, sizeof(str) - 1) > 0)
       printf(" -> %s", str);
   }
 
