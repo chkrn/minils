@@ -25,6 +25,8 @@ int main(int argc, char *argv[])
 
   int files_num = 0;
   struct dirent **files = NULL;
+  char **full_files_paths = NULL;
+  struct stat *st = NULL;
 
   // Cmd line options -->
     char *user_path = NULL;
@@ -84,40 +86,66 @@ int main(int argc, char *argv[])
     goto fail;
   }
 
-  for(i = 0; i < files_num; i++)
+  if(user_path)
   {
-    struct stat st;
-    char *full_file_path = NULL;
+    full_files_paths = malloc(files_num * sizeof(char*));
 
-    if(user_path)
+    for(i = 0; i < files_num; i++)
     {
       size_t full_file_path_len = strlen(user_path) + 1 /*delimeter*/ + strlen(files[i]->d_name);
-      full_file_path = malloc(full_file_path_len + 1 /*NULL-terminator*/);
-      snprintf(full_file_path, full_file_path_len + 1, "%s/%s", user_path, files[i]->d_name);
+      full_files_paths[i] = malloc(full_file_path_len + 1 /*NULL-terminator*/);
+      snprintf(full_files_paths[i], full_file_path_len + 1, "%s/%s", user_path, files[i]->d_name);
     }
-    else
-      full_file_path = files[i]->d_name;
-
-    if(lstat(full_file_path, &st) != 0)
-    {
-      perror("Failed to get file info");
-      goto fail;
-    }
-
-    file_info_print(full_file_path, files[i]->d_name, &st);
-
-    if(user_path)
-      free(full_file_path);
   }
+
+  st = malloc(files_num * sizeof(struct stat));
+
+  {
+    unsigned long long total = 0;
+
+    for(i = 0; i < files_num; i++)
+      if(lstat(full_files_paths ? full_files_paths[i] : files[i]->d_name, st + i) != 0)
+      {
+        perror("Failed to get file info");
+        goto fail;
+      }
+      else
+        total += st[i].st_blocks;
+
+    // According 'man stat' st_blocks is mesaured in 512B blocks,
+    // but 'info coreutils ls' says that 'ls' shows 'total' in 1024B blocks.
+    total /= 2;
+
+    printf("total %llu\n", total);
+  }
+
+  for(i = 0; i < files_num; i++)
+    file_info_print(full_files_paths ? full_files_paths[i] : files[i]->d_name, files[i]->d_name, st + i);
 
 ok:
   rval = 0;
 
 fail:
-  for(i = 0; i < files_num; i++)
-    free(files[i]);
+  if(files)
+  {
+    for(i = 0; i < files_num; i++)
+      free(files[i]);
 
-  free(files);
+    free(files);
+    files = NULL;
+  }
+
+  if(full_files_paths)
+  {
+    for(i = 0; i < files_num; i++)
+      free(full_files_paths[i]);
+
+    free(full_files_paths);
+    full_files_paths = NULL;
+  }
+
+  free(st);
+  st = NULL;
 
   return rval;
 }
