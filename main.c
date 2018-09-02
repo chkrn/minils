@@ -20,10 +20,12 @@ int main(int argc, char *argv[])
   int i;
   int rval = 1;
 
-  int files_num = 0;
-  struct dirent **files = NULL;
-  char **full_files_paths = NULL;
-  struct stat *st = NULL;
+  // Dynamically allocated data -->
+    int files_num = 0;
+    struct dirent **files = NULL;
+    char **full_files_paths = NULL;
+    struct stat *st = NULL;
+  // Dynamically allocated data <--
 
   // Cmd line options -->
     char *user_path = NULL;
@@ -85,6 +87,8 @@ int main(int argc, char *argv[])
 
   if(user_path)
   {
+    // If user specified path, than files are not in current directory
+    // and we need to build paths to every file to call lstat.
     full_files_paths = malloc(files_num * sizeof(char*));
 
     for(i = 0; i < files_num; i++)
