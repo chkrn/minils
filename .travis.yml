@@ -3,6 +3,8 @@ compiler: gcc
 env: LC_ALL=C
 script:
   - make
+  - ./ls
   - diff -w <(./ls) <(ls -l | sort -f -k9) # sort because minils uses case insensitive sorting
+  - ./ls -a
   - diff -w <(./ls -a) <(ls -la | sort -f -k9)
 
