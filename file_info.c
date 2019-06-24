@@ -104,7 +104,7 @@ void file_info_print(const char *file_path, const char *filename_to_print, const
   {
     char str[256] = { '\0' };
     if(readlink(file_path, str, sizeof(str) - 1) > 0)
-      printf(" -> %s", str);
+      printf(" ->> %s", str);
   }
 
   printf("\n");
