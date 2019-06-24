@@ -1,5 +1,8 @@
 language: c
 compiler: gcc
+env: LC_ALL=C
 script:
-	- make
-	- ./ls
+  - make
+  - diff -w <(./ls) <(ls -l | sort -f -k9) # sort because minils uses case insensitive sorting
+  - diff -w <(./ls -a) <(ls -la | sort -f -k9)
+
